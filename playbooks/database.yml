@@ -1,0 +1,5 @@
+- name: Configure database server
+  hosts: database
+  roles:
+    - common
+    - database
