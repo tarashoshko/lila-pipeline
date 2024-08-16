@@ -1,0 +1,7 @@
+---
+- name: Install gnupg and curl
+  apt:
+    name:
+      - gnupg
+      - curl
+    state: present

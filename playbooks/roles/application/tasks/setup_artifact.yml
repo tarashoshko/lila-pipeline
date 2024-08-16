@@ -1,0 +1,67 @@
+---
+- name: Install the artifact
+  become: yes
+  shell: |
+    dpkg -i {{ remote_dest }}
+    apt-get install -f
+  when: ansible_os_family == "Debian"
+
+- name: Set permissions for /usr/share/lila/logs
+  become: yes
+  file:
+    path: /usr/share/lila/logs
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+    recurse: yes
+
+- name: Ensure /usr/share/lila directory exists
+  become: yes
+  file:
+    path: /usr/share/lila
+    state: directory
+- name: Create systemd service file for Lila
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/lila.service
+    content: |
+      [Unit]
+      Description=Lila Service
+      After=network.target
+
+      [Service]
+      Type=simple
+      User=vagrant
+      Group=vagrant
+      EnvironmentFile=/etc/environment
+      ExecStart=/usr/share/lila/bin/lila
+      Restart=on-failure
+      RestartSec=10
+
+      [Install]
+      WantedBy=multi-user.target
+    mode: '0644'
+
+- name: Reload systemd to pick up the new service
+  ansible.builtin.systemd:
+    daemon_reload: yes
+
+- name: Start and enable Lila service
+  ansible.builtin.systemd:
+    name: lila.service
+    state: started
+    enabled: yes
+
+- name: Check status of Lila service
+  shell: systemctl status lila.service
+  register: service_status
+  failed_when: >
+    service_status.rc != 0 or
+    ('active (running)' not in service_status.stdout)
+
+- name: Restart Lila service to apply new artifact version
+  become: yes
+  systemd:
+    name: lila.service
+    state: restarted
+    enabled: yes
+  when: ansible_os_family == "Debian"

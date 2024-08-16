@@ -1,0 +1,92 @@
+---
+- name: Install prerequisites
+  apt:
+    update_cache: yes
+    name:
+      - curl
+      - gzip
+      - openjdk-21-jdk
+      - nano
+      - build-essential
+      - git
+      - jq
+    state: present
+
+- name: Install Coursier
+  shell: |
+    curl -fLo /tmp/cs.gz "https://github.com/coursier/launchers/raw/master/cs-x86_64-pc-linux.gz"
+    gzip -d /tmp/cs.gz
+    chmod +x /tmp/cs
+    mv /tmp/cs /usr/local/bin/cs
+  args:
+    creates: /usr/local/bin/cs
+
+- name: Install Scala using Coursier
+  shell: |
+    cs install scala
+    cs install scalac
+  args:
+    creates: /usr/local/bin/scala
+
+- name: Add Scala to PATH
+  shell: |
+    echo 'export PATH="$PATH:/usr/local/bin"' >> ~/.bashrc
+  args:
+    executable: /bin/bash
+
+- name: Install sbt
+  shell: |
+    echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
+    echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
+    curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x99E82A75642AC823" | sudo apt-key add
+    sudo apt-get update
+    sudo apt-get install sbt
+    sbt -version
+  args:
+    executable: /bin/bash
+
+- name: Verify sbt installation
+  command: sbt --version
+  register: sbt_version
+
+- name: Display sbt version
+  debug:
+    msg: "sbt version: {{ sbt_version.stdout }}"
+
+- name: Download and execute NodeSource setup script
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_{{ node_version }} -o nodesource_setup.sh
+    sudo -E bash nodesource_setup.sh
+    sudo apt-get install -y nodejs
+  args:
+    executable: /bin/bash
+
+- name: Verify Node.js installation
+  command: node -v
+  register: installed_node_version
+
+- name: Show Node.js version
+  debug:
+    msg: "Node.js version installed: {{ installed_node_version.stdout }}"
+
+- name: Verify npm installation
+  command: npm -v
+  register: npm_version
+
+- name: Display npm version
+  debug:
+    msg: "npm version installed: {{ npm_version.stdout }}"
+
+- name: Install pnpm
+  shell: npm install -g pnpm
+
+# - name: Add pnpm to PATH
+#   shell: export PATH=$PATH:$(npm bin -g)
+
+- name: Verify pnpm installation
+  command: pnpm -v
+  register: pnpm_version
+
+- name: Show pnpm version
+  debug:
+    msg: "pnpm version installed: {{ pnpm_version.stdout }}"

@@ -1,0 +1,9 @@
+---
+- name: Installs for development environment
+  include_tasks: install.yml
+
+- name: Configuring development environment
+  include_tasks: configure.yml
+
+- name: Build development environment
+  include_tasks: build_and_run.yml

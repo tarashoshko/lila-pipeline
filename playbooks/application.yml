@@ -1,0 +1,7 @@
+- name: Configure application servers
+  hosts: application_servers
+  become: yes
+  vars_files:
+    - roles/application/vars/main.yml
+  roles:
+    - application

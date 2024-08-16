@@ -1,0 +1,49 @@
+---
+- name: Add MongoDB GPG key
+  apt_key:
+    url: "{{ mongodb_gpg_key_url }}"
+    state: present
+
+- name: Add MongoDB repository
+  copy:
+    content: "{{ mongodb_repo }}\n"
+    dest: /etc/apt/sources.list.d/mongodb-org-6.0.list
+
+- name: Download MongoDB GPG key
+  get_url:
+    url: "{{ mongodb_gpg_key_url }}"
+    dest: /tmp/mongodb-server-6.0.asc
+
+- name: Import MongoDB GPG key
+  command: gpg --dearmor -o /usr/share/keyrings/mongodb-server-6.0.gpg /tmp/mongodb-server-6.0.asc
+  args:
+    creates: /usr/share/keyrings/mongodb-server-6.0.gpg
+
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install MongoDB
+  apt:
+    name: "{{ mongodb_package }}"
+    state: present
+
+- name: Start and enable MongoDB service
+  systemd:
+    name: mongod
+    state: started
+    enabled: yes
+
+- name: Wait for MongoDB to be ready
+  wait_for:
+    port: "{{ mongodb_port }}"
+    host: "{{ mongodb_ip }}"
+    timeout: 30
+
+- name: Copy MongoDB setup script to VM
+  copy:
+    src: indexes.js
+    dest: indexes.js
+
+- name: Run MongoDB setup script
+  command: mongosh indexes.js

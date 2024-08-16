@@ -1,0 +1,9 @@
+---
+- name: Install dependencies for application environment
+  include_tasks: install.yml
+
+- name: Setup artifact for application environment
+  include_tasks: setup_environment.yml
+
+- name: Setup artifact for application environment
+  include_tasks: setup_artifact.yml

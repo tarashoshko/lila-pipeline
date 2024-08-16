@@ -1,0 +1,22 @@
+mongosh_gpg_key_url: "https://www.mongodb.org/static/pgp/server-5.0.asc"
+mongosh_repo: "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse"
+mongosh_package: "mongodb-org-shell"
+
+# Variables for setuping development environment
+node_version: "22.x"
+jdk_url: "https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb"
+nvm_dir: "/usr/local/nvm"
+pnpm_bin: "/usr/local/bin/pnpm"
+
+# General variables
+ssh_key_path: "/home/vagrant/.ssh/id_rsa"
+ssh_key_size: 2048
+ssh_key_type: "rsa"
+db_public_key_path: "db_ssh_key.pub"
+
+# Variables for MongoDB machine
+mongodb_admin_user: "admin"
+mongodb_admin_password: "admin"
+mongodb_database: "lila"
+mongodb_port: 27017
+mongodb_ip: "10.0.0.3"

@@ -1,0 +1,9 @@
+---
+- name: Configure development servers
+  hosts: development
+  become: yes
+  vars_files:
+    - roles/development/vars/main.yml
+    - roles/development/vars/vault.yml
+  roles:
+    - development

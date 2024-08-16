@@ -1,0 +1,39 @@
+---
+- name: Generate SSH key pair
+  ansible.builtin.openssh_keypair:
+    path: "{{ ssh_key_path }}"
+    type: "{{ ssh_key_type }}"
+    size: "{{ ssh_key_size }}"
+    state: present
+  become: true
+  become_user: vagrant
+  register: ssh_key
+
+- name: Ensure .ssh directory exists
+  file:
+    path: /home/vagrant/.ssh
+    state: directory
+    mode: '0700'
+    owner: vagrant
+    group: vagrant
+
+- name: Add public key to authorized_keys
+  authorized_key:
+    user: vagrant
+    state: present
+    key: "{{ lookup('file', '/home/vagrant/.ssh/id_rsa.pub') }}"
+
+- name: Create directory to share public key
+  file:
+    path: "{{ shared_keys_dir }}"
+    state: directory
+    mode: '0755'
+    owner: vagrant
+    group: vagrant
+
+- name: Copy public key to a file accessible to other machines
+  copy:
+    content: "{{ ssh_key.public_key }}"
+    dest: "{{ shared_keys_dir }}/{{ shared_key_filename }}"
+  become: true
+  become_user: vagrant

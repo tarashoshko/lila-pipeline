@@ -1,0 +1,55 @@
+---
+- name: Clone private repository
+  git:
+    repo: 'https://{{ github_token }}@github.com/tarashoshko/lila.git'
+    dest: /home/vagrant/lila
+    version: main
+    force: yes
+
+- name: Add MongoDB GPG key
+  shell: |
+    wget -qO - {{ mongosh_gpg_key_url }} | sudo apt-key add -
+  args:
+    executable: /bin/bash
+
+- name: Add MongoDB repository
+  shell: |
+    echo "{{ mongosh_repo }}" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+    sudo apt-get update
+  args:
+    executable: /bin/bash
+
+- name: Install MongoDB Shell
+  apt:
+    name: "{{ mongosh_package }}"
+    state: present
+
+- name: Check MongoDB Shell version
+  shell: mongo --version
+  register: mongo_version
+
+- name: Display MongoDB Shell version
+  debug:
+    msg: "MongoDB Shell version: {{ mongo_version.stdout }}"
+        
+- name: Ensure base.conf is writable
+  become: yes
+  file:
+    path: /home/vagrant/lila/conf/base.conf
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+
+- name: Update MongoDB URI in base.conf
+  become: yes
+  lineinfile:
+    path: /home/vagrant/lila/conf/base.conf
+    regexp: '^  uri = "mongodb://.*?appName=lila"$'
+    line: '  uri = "mongodb://{{ mongodb_admin_user }}:{{ mongodb_admin_password }}@{{ mongodb_ip }}:{{ mongodb_port }}/{{ mongodb_database }}"'
+    backup: yes
+    state: present
+  register: update_result
+
+- name: Display update result
+  debug:
+    msg: "Update result: {{ update_result }}"

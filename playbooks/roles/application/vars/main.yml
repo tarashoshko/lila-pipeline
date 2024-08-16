@@ -1,0 +1,4 @@
+---
+version: "1.0.0"
+artifact_file: "lila_{{ version }}_all.deb"
+remote_dest: "/home/vagrant/{{ artifact_file }}"

@@ -1,0 +1,5 @@
+- name: Set up Load Balancer with Nginx
+  hosts: load_balancer
+  become: yes
+  roles:
+    - load_balancer

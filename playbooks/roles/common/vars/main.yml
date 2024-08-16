@@ -1,0 +1,4 @@
+ssh_key_path: "/home/vagrant/.ssh/id_rsa"
+ssh_key_size: 2048
+ssh_key_type: "rsa"
+db_public_key_path: "db_ssh_key.pub"

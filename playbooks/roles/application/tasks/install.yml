@@ -1,0 +1,8 @@
+---
+- name: Install prerequisites
+  apt:
+    update_cache: yes
+    name:
+      - openjdk-21-jdk
+      - redis
+    state: present

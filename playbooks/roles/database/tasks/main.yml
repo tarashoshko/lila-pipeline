@@ -1,0 +1,9 @@
+---
+- name: Install prerequisites
+  import_tasks: install_prerequisites.yml
+
+- name: Setup MongoDB
+  import_tasks: setup_mongodb.yml
+
+- name: SSH setup
+  import_tasks: ssh_setup.yml

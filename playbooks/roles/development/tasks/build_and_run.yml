@@ -1,0 +1,41 @@
+---
+- name: Ensure .ssh directory exists
+  file:
+    path: /home/vagrant/.ssh
+    state: directory
+    mode: '0700'
+    owner: vagrant
+    group: vagrant
+
+- name: Copy public key to authorized_keys
+  authorized_key:
+    user: vagrant
+    state: present
+    key: "{{ lookup('file', db_public_key_path) }}"
+
+- name: Ensure /tmp has correct permissions
+  file:
+    path: /tmp
+    state: directory
+    mode: '1777'
+
+- name: Ensure .sbt directory has correct permissions
+  file:
+    path: /tmp/.sbt
+    state: directory
+    mode: '1777'
+    owner: vagrant
+    group: vagrant
+
+- name: Change ownership of the project directory
+  file:
+    path: /home/vagrant/lila
+    state: directory
+    recurse: yes
+    owner: vagrant
+    group: vagrant
+
+- name: Sbt integration
+  shell: |
+    cd /home/vagrant/lila
+    timeout -s SIGTERM 60 ./lila || true

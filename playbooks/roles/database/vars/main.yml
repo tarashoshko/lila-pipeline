@@ -1,0 +1,11 @@
+---
+mongodb_gpg_key_url: 'URL до GPG ключа MongoDB'
+mongodb_repo: 'deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse'
+mongodb_package: 'mongodb-org'
+mongodb_port: 27017
+mongodb_ip: '127.0.0.1'
+ssh_key_path: '/home/vagrant/.ssh/id_rsa'
+ssh_key_type: 'rsa'
+ssh_key_size: 2048
+shared_keys_dir: '/vagrant/shared_keys'
+shared_key_filename: 'id_rsa.pub'

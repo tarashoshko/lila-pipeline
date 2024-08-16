@@ -1,0 +1,20 @@
+--- 
+- name: Copy artifact to remote machines
+  become: yes
+  copy:
+    src: "/home/vagrant/{{ artifact_file }}"
+    dest: "{{ remote_dest }}"
+    remote_src: no
+    
+- name: Ensure /etc/environment file exists
+  ansible.builtin.file:
+    path: /etc/environment
+    state: touch
+
+- name: Set LILA_DOMAIN environment variable
+  become: yes
+  lineinfile:
+    path: /etc/environment
+    line: 'LILA_DOMAIN={{ ansible_host }}:{{ lila_port }}'
+    create: yes
+    state: present
